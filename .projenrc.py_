@@ -1,0 +1,188 @@
+"""
+Advantages of using projen:
+
+- support for TypeScript projects as well as python, including
+    - TypeScript CDK constructs (JSII, exportable to all languages)
+    - TypeScript CDK app
+    - TypeScript project
+- 
+"""
+
+from typing import Any, Callable, Dict, Generator, Generic, List, TypeVar
+from projen.python import PythonProject, VenvOptions
+from projen.github import GitHubProject
+from projen import Project, ProjenrcOptions, TextFile, Component, SampleDir, SampleFile
+from projen import TaskStep, Task
+from python_package import PythonPackage
+
+from lazy_sample_file import LazySampleFile
+from templatized_file import TemplatizedFile
+
+"""
+How will we publish Python-based constructs for projen?
+
+We could place a venv in .projen of the monorepo. That would be the env that does "pip install projen".
+We would also "pip install <our custom python projen Components/Projects>".
+
+Then, updating the project would be:
+
+```bash
+source .projen/venv/bin/activate
+python .projenrc.py
+```
+"""
+
+from pathlib import Path
+from rich import print
+
+
+# (1) specifying the .projenrc.{py|js} language happens in the PythonProject, we may want to
+#     create our own "MonoRepo" project class that extends from Project which also gives this option.
+#     We could reference PythonProject to see how they made the .projenrc language configurable.
+monorepo = Project(
+    name="parent-project",
+)
+
+monorepo.add_git_ignore("./venv/")
+
+# PythonProject has some differences with how we've set up projects:
+#   It doesn't use SetupCfg, only setup.py. And it only gives setup.py a JSON object with kwargs.
+#   We'd want to have the find_packages: directive.
+# It doesn't use a src/ folder.
+python_project_1 = PythonProject(
+    parent=monorepo,
+    # changing this value doesn't move the old files over; it simply creates a new project. Is that the behavior we'd want? 🤔
+    outdir="python-sub-project",
+    author_email="eric.riddoch@gmail.com",
+    author_name="Eric Riddoch",
+    module_name="projen_python",
+    name="projen-python",
+    version="0.1.0",
+    setuptools=True,
+    # you don't *have* to use the semver syntax, but you can. If you do, the correct python
+    # version range syntax works which is really cool
+    deps=["jinja2@^3.1.2"],
+    setup_config={"extras_require": {"eric": ["boto3"]}},
+    venv_options=VenvOptions(envdir=f"{monorepo.outdir}/venv"),
+)
+python_project_1.module_name
+
+brub_txt = TextFile(
+    project=python_project_1,
+    file_path="brub.txt",
+    lines=[
+        "This is brub speaking.",
+        "",
+        "May I ask who is calling?",
+        "",
+        "No",
+        "",
+        "Okay then... bye!",
+    ],
+)
+
+"""
+NOTE on sample files:
+
+If they already exist, projen will leave them alone. If they don't exist, projen will ALWAYS
+create them. This may not be ideal. A sample directory is similar. A sample directory contains
+many sample files, but if you delete a child file or folder, it WON'T be recreated. The only time
+any file in a sample directory is recreated after deletion is when the entire sample directory is
+deleted.
+
+So sample files are sort of... required. It's difficult for end users to completely delete them
+if they don't want them around.
+
+Projen's SampleFile doesn't inherit from BaseFile, instead directly from Component. It simply
+has a synthesize() method that creates a file if desired (optionally read only). The file
+isn't created if it already exists. Simple enough. We could reimplement this from scratch
+and simply use Jinja. It's sad. I was hoping to use that native Component.
+
+We'd need to create our own TemplatizedSampleDir if we plan to make our own TemplatizedSampleFile.
+
+Inheritng from BaseFile lets us easily register files in the files.json, but we don't need that.
+The point of files.json is to register files as tamper proof. Sample files are meant to be
+tampered/edited by the user.
+
+If we're going to the lengths of writing our own sample files... is there a way we can solve
+the auto-regeneration problem?
+"""
+
+
+# monorepo = Project(
+#     name="parent-project",
+# )
+
+# JinjaSampleFile(
+#     project=monorepo,
+#     file_path="cool-sample-file.txt",
+#     template="""\
+#     Hi, I'm a template.
+
+#     Your name is {{ name }},
+#     but *his* name is {{ other_name }}.
+#     """,
+# )
+
+SampleFastAPIApp(project=python_project_1)
+
+numbers = [1, 2, 3]
+LazySampleFile(
+    project=python_project_1,
+    file_path="lazy-sample-file.txt",
+    get_contents_fn=lambda: f"I'm a file with numbers! {numbers}",
+)
+LazySampleFile(
+    project=python_project_1,
+    file_path="lazy-sample/nested-lazy-sample-file.txt",
+    get_contents_fn=lambda: f"I'm a nested file with numbers! {numbers}",
+)
+
+numbers.append(4)
+numbers.append(5)
+numbers.append(6)
+
+template_file = TemplatizedFile(
+    project=python_project_1,
+    file_path="from-jinja.txt",
+    template_body="{% for name in names %}{{ name }},{% endfor %}",
+    is_sample=True,
+    get_values_fn=lambda: {"names": ["Eric", "Joe", "Murph"]},
+)
+
+# project = GitHubProject(name="gh-project")
+
+
+# project.add_task(
+#     name="cool task",
+#     condition="! cat some-file-whose-existence-means-the-task-already-ran.txt",
+#     env={},
+#     required_env=[],
+#     steps=[
+#         TaskStep(exec="echo 'hi'"),
+#         TaskStep(exec="echo 'aw yeah'"),
+#     ],
+# )
+
+PythonPackage(
+    name="eric-python-project",
+    outdir="eric-python-project",
+    module_name="eric_pkg",
+    install_requires=["setuptools"],
+    additional_extras_require={"docs": ["sphinx"]},
+    parent=monorepo,
+)
+
+data = {
+    "flake8": {
+        "max_line_length": 88,
+        "extend_ignore": ",".join(["E203", "W503", "F821"]),
+    }
+}
+
+ini = IniFile(repo, ".flake8", obj=data)
+
+monorepo.synth()
+
+
+# project.synth()

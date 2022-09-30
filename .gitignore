@@ -10,3 +10,8 @@ node_modules/
 *.env
 *venv
 *.venv
+*pyc*
+dist
+build
+*.whl
+*egg-info

@@ -1,11 +1,9 @@
-from projen.python import PythonProject
+from phito_projen import PythonPackage
 
-project = PythonProject(
-    author_email="eric.riddoch@bengroup.com",
-    author_name="Eric Riddoch",
-    module_name="projen_python",
-    name="projen-python",
-    version="0.1.0",
+project = PythonPackage(
+    name="phitoduck-projen",
+    module_name="phito_projen",
+    install_requires=["projen", "jinja2"]
 )
 
 project.synth()
