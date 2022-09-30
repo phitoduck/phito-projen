@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Union
 from projen import Component, TomlFile, Project, JsonPatch
 
+# docutils is needed if the long_description_... is an rst file (README.rst instead of README.md)
 DEFAULT_PYPROJECT_TOML_OBJ = {
     "build-system": {
         "requires": ["setuptools>=46.1.0", "wheel", "build", "docutils"],
