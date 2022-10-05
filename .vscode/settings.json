@@ -1,5 +1,15 @@
 {
     "editor.formatOnSave": true,
     "python.formatting.blackPath": "black",
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "files.associations": {
+        // prevent warnings on this file for having comments
+        "settings.json": "jsonc",
+        "template.settings.json": "jsonc",
+        "*.flake8": "ini",
+        "*.cfg": "ini",
+        "*.pylintrc": "ini",
+        "MANIFEST.in": "ini",
+        "{j,J}ustfile": "just",
+    }
 }

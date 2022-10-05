@@ -1,0 +1,11 @@
+from phito_projen import PythonPackage
+
+project = PythonPackage(
+    name="{{ project_name }}",
+    module_name="{{ module_name }}",
+    install_requires={{ install_requires }},
+    version="0.0.2",
+    additional_extras_require={{ additional_extras_require }},
+)
+
+project.synth()

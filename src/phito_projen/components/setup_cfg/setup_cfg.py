@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Union
+from typing import Dict, List, Optional, Union
 from phito_projen.components.templatized_file import TemplatizedFile
 from projen import Component
 from projen import Project
@@ -16,13 +16,19 @@ class SetupCfg(Component):
         project: "Project",
         install_requires: List[str],
         package_name: str,
+        package_version: str,
+        extras_require: Optional[Dict[str, List[str]]] = None,
+        entrypoints: Optional[Dict[str, str]] = None,
         file_path: Union[str, Path] = "setup.cfg",
     ) -> None:
         super().__init__(project)
         self.file_path = Path(file_path)
 
+        self.extras_require = extras_require or {}
+        self.entrypoints = entrypoints or {}
         self.install_requires = install_requires
         self.package_name = package_name
+        self.package_version = package_version
 
         self.setup_cfg_file = TemplatizedFile(
             project=project,
@@ -32,6 +38,9 @@ class SetupCfg(Component):
             get_values_fn=lambda: {
                 "name": self.package_name,
                 "install_requires": self.install_requires,
+                "version": self.package_version,
+                "extras_require": self.extras_require,
+                "entrypoints": self.entrypoints,
             },
             supports_comments=True,
             make_comment_fn=lambda line: f"# {line}",

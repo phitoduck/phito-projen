@@ -1,10 +1,14 @@
 from copy import deepcopy
+from functools import cached_property
 from pathlib import Path
+from textwrap import dedent
 from typing import Any, Dict, List, Optional, Type
 from projen import DependencyType, Project
+from phito_projen.components.manifest_in import ManifestIn
 from phito_projen.components.pyproject_toml import PyprojectToml
 from phito_projen.components.lazy_sample_file import LazySampleFile
 from phito_projen.components.setup_py import SetupPy
+from projen import TextFile
 import re
 from phito_projen.components.setup_cfg.setup_cfg import SetupCfg
 
@@ -24,14 +28,17 @@ class PythonPackage(Project):
         *,
         name: str,
         module_name: str,
+        version: str,
         install_requires: Optional[List[str]] = None,
         additional_extras_require: Optional[TPythonExtras] = None,
+        entrypoints: Optional[Dict[str, str]] = None,
         outdir: Optional[str] = None,
         parent: Optional["Project"] = None,
     ) -> None:
         """
         :param module_name: Name of the python package as used in imports and filenames. \
             Must only consist of alphanumeric characters and underscores.
+        :param version: semantic version of the package; will be the version in PyPI
         :param install_requires: List of runtime dependencies for this project. \
             Dependencies may use the format: ``<module>@<semver>`` or standard ``pip`` format, e.g. ``pandas>=1, <2`` \
             Additional dependencies can be added via ``project.add_dependency()``.
@@ -71,11 +78,24 @@ class PythonPackage(Project):
             self,
             file_path="setup.cfg",
             package_name=name,
+            package_version=version,
+            extras_require=self.extras_require,
+            entrypoints=entrypoints,
             # TODO: have a more elegant way to keep setup_cfg.install_requires up to date with the package install requires
             install_requires=self.install_requires,
         )
         self.setup_py = SetupPy(self)
         self.gitignore.add_patterns("*.env", "*venv", "*.venv", "*pyc*", "dist", "build", "*.whl", "*egg-info")
+
+    @cached_property
+    def manifest_in(self) -> ManifestIn:
+        """
+        Include a ``MANIFEST.in`` for keeping non-code files in the final package.
+        
+        Use this if you want to include images, templates, binaries, or other assets
+        in the ``pip``-installable version of your package.
+        """
+        return ManifestIn(self)
 
     # NOTE: pre_synthesize can change state of components, but it should not add or remove components
     # I'm not sure what the behavior would be if you did that
