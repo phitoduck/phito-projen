@@ -1,5 +1,4 @@
 from phito_projen import PythonPackage
-from phito_projen.components.projenrc_py.projenrc_py import ProjenrcPy
 
 project = PythonPackage(
     name="phitoduck-projen",
