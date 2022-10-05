@@ -9,12 +9,4 @@ project = PythonPackage(
 )
 project.manifest_in.add_recursive_include("src/", "*template*", comment="include template files for rendering components")
 
-ProjenrcPy(project, package_name="phitoduck-projen",
-    module_name="phito_projen",
-    install_requires=["projen", "jinja2"],
-    file_path="yo.py",
-    package_version="1.2.3",
-    additional_extras_require={},
-)
-
 project.synth()
