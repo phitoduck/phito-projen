@@ -208,3 +208,4 @@ Ta-da! 🎉
 - [ ] Add components for config files for code QA tools like `pylint`, `flake8`, `pytest`, `black`, etc.
   - [ ] Add a component for `.vscode/settings.json` that promps you to fix errors from these tools as you code, rather than having to wait to run a linting task.
 - [ ] Investigate `commitizen` as a way of automatically bumping package versions and generating changelogs.
+- [ ] Add tests
