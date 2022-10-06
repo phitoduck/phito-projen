@@ -51,7 +51,7 @@ from phito_projen import PythonPackage
 
 package = PythonPackage(
     name="phitoduck-projen",
-    module_name="example_pkg",
+    module_name="phitoduck_projen",
     install_requires=["projen", "jinja2"],
     version="0.1.0",
 )
@@ -107,7 +107,7 @@ from samples.fastapi_app import SampleFastAPIApp
 
 package = PythonPackage(
     name="phitoduck-projen",
-    module_name="phito_projen",
+    module_name="example_pkg",
     install_requires=["projen", "jinja2"],
     version="0.1.0",
 )
