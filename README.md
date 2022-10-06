@@ -68,6 +68,7 @@ phitoduck-projen/
 ├── pyproject.toml
 ├── setup.cfg
 ├── setup.py
+├── MANIFEST.in
 └── src/
 ```
 
