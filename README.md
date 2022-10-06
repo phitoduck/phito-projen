@@ -51,7 +51,7 @@ from phito_projen import PythonPackage
 
 package = PythonPackage(
     name="phitoduck-projen",
-    module_name="phito_projen",
+    module_name="example_pkg",
     install_requires=["projen", "jinja2"],
     version="0.1.0",
 )
