@@ -6,7 +6,7 @@
 >
 > This library is in rapid development. Expect breaking API changes.
 
-A library of Python-based `projen` components that can be used in `.projenrc.py`.
+A library of Python-based [`projen`](https://github.com/projen/projen) components that can be used in `.projenrc.py`.
 
 ## Philosophies
 
