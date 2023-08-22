@@ -4,7 +4,7 @@
 
 > ⚠️ Warning
 >
-> This library is in rapid development. Expect breaking API changes.
+> This library is for reference and not actively maintained. Teams will likely want to build their own internal set of projen components.
 
 A library of Python-based [`projen`](https://github.com/projen/projen) components that can be used in `.projenrc.py`.
 
